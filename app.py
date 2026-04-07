@@ -38,8 +38,17 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+def ensure_data():
+    """Generate data if database doesn't exist."""
+    if not os.path.exists(DB_PATH):
+        print("Generating data...")
+        import subprocess
+        subprocess.run(["python3", "generate_data.py"], check=True)
+        subprocess.run(["python3", "etl_pipeline.py"], check=True)
+
 def load_data():
     """Load data from SQLite."""
+    ensure_data()
     conn = sqlite3.connect(DB_PATH)
     
     machines = pd.read_sql("SELECT * FROM machines", conn)
